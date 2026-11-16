@@ -15,12 +15,51 @@ public class ToolRegistry {
     private final SwfTools swfTools = new SwfTools();
     private final SwfAnalysisTools analysisTools = new SwfAnalysisTools();
     private final SwfModificationTools modificationTools = new SwfModificationTools();
+    private final SwfAs2Tools as2Tools = new SwfAs2Tools();
 
     public ToolRegistry() {
         registerBaseTools();
         registerAnalysisTools();
         registerModificationTools();
         registerTagSymbolTools();
+        registerAs2Tools();
+    }
+
+    private void registerAs2Tools() {
+        register("list_as2_scripts",
+                "List AVM1/ActionScript 2 sources in SWF or Scaleform GFx, including nested sprite, button and clip actions. Paths are sorted and scoped to the selected movie.",
+                schema(
+                        optional("file_path", "string", "Movie path; omitted uses the active session"),
+                        optional("filter", "string", "Literal case-sensitive substring of script_path"),
+                        optional("offset", "integer", "Offset into the filtered source list, default 0"),
+                        optional("limit", "integer", "Sources per page, 1-200, default 50")
+                ), as2Tools::listScripts);
+        register("decompile_as2_script",
+                "Decompile one exact script_path from list_as2_scripts. Returns a bounded text page; follow next_offset until null. Offsets count UTF-16 code units.",
+                schema(
+                        optional("file_path", "string", "Movie path; omitted uses the active session"),
+                        required("script_path", "string", "Exact source path returned by list_as2_scripts"),
+                        optional("offset", "integer", "UTF-16 text offset, default 0"),
+                        optional("max_chars", "integer", "UTF-16 code units per page, 1-65536, default 16000")
+                ), as2Tools::decompileScript);
+        register("get_as2_bytecode",
+                "Disassemble one exact AS2 script_path as AVM1 P-code. Returns a bounded text page; offsets count UTF-16 code units.",
+                schema(
+                        optional("file_path", "string", "Movie path; omitted uses the active session"),
+                        required("script_path", "string", "Exact source path returned by list_as2_scripts"),
+                        optional("offset", "integer", "UTF-16 text offset, default 0"),
+                        optional("max_chars", "integer", "UTF-16 code units per page, 1-65536, default 16000")
+                ), as2Tools::getBytecode);
+        register("search_as2_source",
+                "Search decompiled AS2 with a literal query. Returns one bounded snippet per matching source and explicit decompilation failures. Follow next_offset to scan remaining sources.",
+                schema(
+                        optional("file_path", "string", "Movie path; omitted uses the active session"),
+                        required("query", "string", "Nonempty literal query, at most 4096 UTF-16 code units"),
+                        optional("case_sensitive", "boolean", "Case-sensitive search, default true"),
+                        optional("offset", "integer", "Offset into the sorted source list, default 0"),
+                        optional("scan_limit", "integer", "Sources to inspect per request, 1-100, default 20"),
+                        optional("limit", "integer", "Matching sources per page, 1-100, default 20")
+                ), as2Tools::searchSource);
     }
 
     private void registerBaseTools() {

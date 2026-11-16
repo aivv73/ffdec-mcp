@@ -18,16 +18,8 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      - name: Download and install ffdec_lib (pinned)
-        run: |
-          TAG=version25.1.3
-          VERSION=25.1.3
-          curl -L "https://github.com/jindrapetrik/jpexs-decompiler/releases/download/${TAG}/ffdec_lib_${VERSION}.zip" -o ffdec_lib.zip
-          unzip ffdec_lib.zip -d ffdec_lib_dir
-          mvn install:install-file -Dfile=ffdec_lib_dir/ffdec_lib.jar -DgroupId=com.jpexs -DartifactId=ffdec_lib -Dversion=25.1.3 -Dpackaging=jar
-
-      - name: Build with Maven (skip tests - release build)
-        run: mvn -B -DskipTests clean package --file pom.xml
+      - name: Build and run synthetic tests
+        run: bash scripts/build.sh --batch-mode
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

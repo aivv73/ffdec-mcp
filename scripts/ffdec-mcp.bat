@@ -1,3 +1,3 @@
 @echo off
 set "DIR=%~dp0\.."
-java -jar "%DIR%\target\ffdec-mcp-1.0.0.jar" %*
+java -Djava.awt.headless=true -jar "%DIR%\target\ffdec-mcp-server-1.0.0.jar" %*

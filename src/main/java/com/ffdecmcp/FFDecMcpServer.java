@@ -15,7 +15,7 @@ import java.util.logging.*;
 public class FFDecMcpServer {
 
     private static final Logger LOG = Logger.getLogger(FFDecMcpServer.class.getName());
-    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
+    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
 
     private final ToolRegistry toolRegistry;
     private final InputStream inputStream;
@@ -49,6 +49,8 @@ public class FFDecMcpServer {
 
         FFDecMcpServer server = new FFDecMcpServer(System.in, System.out);
         server.run();
+        // This entry point owns the JVM; JPEXS retains private non-daemon workers.
+        System.exit(0);
     }
 
     public void run() {
